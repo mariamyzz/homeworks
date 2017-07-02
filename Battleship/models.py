@@ -55,7 +55,19 @@ class Grid(list):
     def offset_values(deck):
         offset_list = [-1, 1, 10, -10, 11, -11, 9, -9]
 
-        if deck // 10 == 0:
+        if deck // 10 == 0 and deck % 10 == 0:
+            offset_list = [1, 10, 11]
+        
+        elif deck // 10 == 9 and deck % 10 == 0:
+            offset_list = [1, -10, -9]
+
+        elif deck // 10 == 0 and deck % 10 == 9:
+            offset_list = [-1, 9, 10]
+            
+        elif deck // 10 == 9 and deck % 10 == 9:
+            offset_list = [-1, -10, -11] 
+
+        elif deck // 10 == 0:
             offset_list = [1, -1, 9, 10, 11]
 
         elif deck // 10 == 9:
@@ -67,17 +79,7 @@ class Grid(list):
         elif deck % 10 == 9:
             offset_list = [-1, 10, -10, -11, 9]
 
-        elif deck // 10 == 0 and deck % 10 == 0:
-            offset_list = [1, 10, 11]
         
-        elif deck // 10 == 9 and deck % 10 == 0:
-            offset_list = [1, -10, -9]
-
-        elif deck // 10 == 0 and deck % 10 == 9:
-            offset_list = [-1, 9, 10]
-            
-        elif deck // 10 == 9 and deck % 10 == 9:
-            offset_list = [-1, -10, -11]
 
         return offset_list
 
