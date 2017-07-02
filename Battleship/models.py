@@ -6,13 +6,6 @@ import sys
 from constants import *
 
 
-def typewriter_effect(line):
-    for letter in line:
-        print(letter, end='')
-        sys.stdout.flush()
-        sleep(0.03)
-
-
 class Grid(list):
 
     def print(self):
@@ -42,13 +35,13 @@ class Grid(list):
 
 
     @staticmethod
-    def check_and_return_index(square):
+    def check_index(square):
         """
         Uses the get_index function to see if there is such a square on the grid.
         Prompts a user to input correct coordinates, if there is not.
-        Returns square index (int)
+        Returns: square index (int)
         """
-        while Grid.get_index(square) not in range(0, 100):
+        while Grid.get_index(square) not in range(101):
                 square = input('Enter a valid square coordinates, like a1 or j10: ')
         return Grid.get_index(square)
 
@@ -74,7 +67,7 @@ class Grid(list):
         return offset_list
 
 
-    def is_home_square_empty(self, square_index):
+    def is_square_empty(self, square_index):
         """True, if empty, False, if not"""
         if self.homegrid[square_index] == DECK:
             return False
@@ -100,11 +93,12 @@ class Player(Grid):
         return: None, runs a loop to get the indeces for all the ships, 
         and places DECK on the grids to display them
         """
-        typewriter_effect('This is your home grid.\n')
+
+        typewriter('This is your home grid.\n')
         sleep(0.7)
         self.homegrid.print()       
         sleep(0.7)
-        typewriter_effect('Now please arrange your ships on the grid, one by one.\n')
+        typewriter('Now please arrange your ships on the grid, one by one.\n')
         sleep(0.7)
 
         for ship_type, (decks_number, ships_number) in SHIPS_DETAILS.items():
@@ -112,40 +106,21 @@ class Player(Grid):
                 print('Please arrange your {}. It is the {} one from {} in total.'.\
                                    format(ship_type, NUMERIC[i], ships_number))
                 for deck in range(decks_number):
-                    square_index = Grid.check_and_return_index(input('Add a deck to the next square: '))
-
-
-                    while not self.can_set_the_deck(self.ships[ship_type][i], square_index) or \
-                          not self.can_add_deck_to_the_ship(self.ships[ship_type][i], square_index):
-
-                        if not self.can_set_the_deck(self.ships[ship_type][i], square_index):
-                            if not self.is_home_square_empty(square_index):
-                                print('You already have a ship there.')
-                            else:
-                                print('Ships cannot touch each other.')
-                        elif not self.can_add_deck_to_the_ship(self.ships[ship_type][i], square_index):
-                            print('Ship decks must go in line.')
-
-                        square_index = Grid.check_and_return_index(input('Choose a square: '))
-
+                    square_index = self.new_valid_deck_index(self.ships[ship_type][i])
 
                     self.ships[ship_type][i].append(square_index)
                     self.homegrid[square_index] = DECK
                     self.homegrid.print()
 
-        typewriter_effect('Perfect. You are all set.\n')
+        typewriter('Perfect. You are all set.\n')
 
 
     def is_sunk(self, square_index):
-        """gets the index of a square and tells 
-        if this is the last not hit square in the ship 
-        so it will be sunk now, once hit"""
-        for _, ships in self.ships.items():
-            for ship in ships:
-                if square_index in ship and \
-                   (False) not in list(map(lambda x: self.homegrid[x] == HIT, \
-                   [i for i in ship if i != square_index])):
-                    return True
+        ship = self.find_ship(square_index)
+        for deck in ship:
+            if self.homegrid[deck] != HIT:
+                return False
+        return True
 
 
     def find_ship(self, square_index):
@@ -155,7 +130,7 @@ class Player(Grid):
                     return ship
 
 
-    def can_set_the_deck(self, current_ship: list, square_index: int):
+    def is_deck_settable(self, current_ship: list, square_index: int):
         for ship_type, ships in self.ships.items():
             for ship in ships:
                 if ship != [] and ship != current_ship:
@@ -169,8 +144,8 @@ class Player(Grid):
         return True
 
 
-    def can_add_deck_to_the_ship(self, ship: list, deck: int):
-        if len(ship) == 0 and self.is_home_square_empty(deck):
+    def is_deck_appendable(self, ship: list, deck: int):
+        if len(ship) == 0 and self.is_square_empty(deck):
             return True
 
         elif len(ship) == 1: 
@@ -190,3 +165,21 @@ class Player(Grid):
                     return True
             else:
                 return False
+
+    def new_valid_deck_index(self, ship):
+        square_index = Grid.check_index(input('Add a deck to the next square: '))
+        
+        while not self.is_deck_settable(ship, square_index) or \
+              not self.is_deck_appendable(ship, square_index):
+
+            if not self.is_deck_settable(ship, square_index):
+                if not self.is_square_empty(square_index):
+                    print('You already have a ship there.')
+                else:
+                    print('Ships cannot touch each other.')
+            elif not self.is_deck_appendable(ship, square_index):
+                print('Ship decks must go in line.')
+
+            square_index = Grid.check_index(input('Choose a square: '))
+
+        return square_index

@@ -2,23 +2,28 @@
 
 from models import *
 
+
+def typewriter(line):
+    for letter in line:
+        print(letter, end='')
+        sys.stdout.flush()
+        sleep(0.03)
+
 def game_init():
     """creates players and their ships"""
-    typewriter_effect('Hi!\n')
-    typewriter_effect('Welcome to the Russian version of the Battleship game.\n')
+    typewriter('Hi!\n')
+    typewriter('Welcome to the Russian version of the Battleship game.\n')
     sleep(0.5)
+
+    player1, player2 = None, None
+
+    for player in [player1, player2]:
+        typewriter(('Please enter the name of the {} player: ').format(NUMERIC[i]))
+        player = Player(input())
+        typewriter("Perfect! " + player.name + ", let's have your ships arranged.\n")
+        player.arrange_home_ships()
     
-    typewriter_effect('Please enter the name of the first player: ')
-    player1 = Player(input())
-    typewriter_effect("Perfect! " + player1.name + ", let's have your ships arranged.\n")
-    player1.arrange_home_ships()
-    
-    typewriter_effect('Please enter the name of the second player: ')
-    player2 = Player(input())
-    typewriter_effect("Perfect! " + player2.name + ", let's have your ships arranged.\n")
-    player2.arrange_home_ships()
-    
-    typewriter_effect("Let's get started.\n")
+    typewriter("Let's get started.\n")
     sleep(1)
     print("\033c")
 
@@ -28,43 +33,43 @@ def game_init():
 def make_a_shot(assailant, opponent: Player):
     """returns True if hit"""
     print("\033c")
-    typewriter_effect(assailant.name + ", this is your foe's grid.\n")
+    typewriter(assailant.name + ", this is your foe's grid.\n")
     sleep(0.5)
     assailant.foegrid.print()
-    typewriter_effect('Choose a square to shoot: ')
+    typewriter('Choose a square to shoot: ')
 
-    shot_square_index = opponent.homegrid.get_index(input())
+    shot_square_index = opponent.homegrid.check_index(input())
 
-    while shot_square_index not in range(101) or opponent.homegrid[shot_square_index] == OFF:
-        shot_square_index = opponent.homegrid.get_index(input\
-            ('Please enter a valid index, and don\'t repeat yourself: '))
+    while opponent.homegrid[shot_square_index] == OFF:
+        print('You already made that shot.')
+        shot_square_index = opponent.homegrid.check_index(input('Try another square: '))
 
     if opponent.homegrid[shot_square_index] == DECK:
-        typewriter_effect('Hit!')
+        assailant.foegrid[shot_square_index] = HIT
+        opponent.homegrid[shot_square_index] = HIT
+        typewriter('Hit!')
+
         if opponent.is_sunk(shot_square_index):
-            typewriter_effect('\nYou have just sunk the whole ship. ')
+            typewriter('\nYou have just sunk the whole ship. ')
             sleep(0.7)
             
             for ship_deck in opponent.find_ship(shot_square_index):
                 for offset in Grid.offset_values(ship_deck):
                     if opponent.homegrid[shot_square_index + offset] != HIT:
-                        try:
-                            opponent.homegrid[shot_square_index + offset] = OFF
-                            assailant.foegrid[shot_square_index + offset] = OFF
-                        except IndexError:
-                            continue
+                        opponent.homegrid[shot_square_index + offset] = OFF
+                        assailant.foegrid[shot_square_index + offset] = OFF
 
 
-        typewriter_effect('\nYou make one more shot.')
-        assailant.foegrid[shot_square_index] = HIT
-        opponent.homegrid[shot_square_index] = HIT
+        typewriter('\nYou make one more shot.')
+        sleep(0.5)
         
         return True
 
     else: 
-        typewriter_effect('Miss. Now {}\'s turn.'.format(opponent.name))
         assailant.foegrid[shot_square_index] = OFF
         opponent.homegrid[shot_square_index] = OFF
+        typewriter('Miss. Now {}\'s turn.'.format(opponent.name))
+        sleep(0.7)
 
         return False
 
@@ -78,9 +83,9 @@ def shooting_turns(player1, player2):
             continue
     
     if player1.homegrid.count(HIT) == 20:
-        typewriter_effect(player2.name + 'won!')
+        typewriter(player2.name + 'won!')
     else:
-        typewriter_effect(player1.name + 'won!')
+        typewriter(player1.name + 'won!')
 
 
 def main():
@@ -92,4 +97,4 @@ if __name__ == '__main__':
     try: 
         main()
     except KeyboardInterrupt:
-        typewriter_effect('\nSee you next time!')
+        typewriter('\nSee you next time!')
