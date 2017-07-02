@@ -3,26 +3,25 @@
 from models import *
 
 
-def typewriter(line):
-    for letter in line:
-        print(letter, end='')
-        sys.stdout.flush()
-        sleep(0.03)
-
 def game_init():
     """creates players and their ships"""
+    
+    def create_player(turn):
+        """  """
+        print("\033c")
+        typewriter(('Please enter the name of the {} player: ').format(NUMERIC[turn]))
+        player = Player(input())
+        typewriter("Perfect! " + player.name + ", let's have your ships arranged.\n")
+        player.arrange_home_ships()
+
+        return player
+
     typewriter('Hi!\n')
     typewriter('Welcome to the Russian version of the Battleship game.\n')
     sleep(0.5)
 
-    player1, player2 = None, None
+    player1, player2 = create_player(0), create_player(1)
 
-    for player in [player1, player2]:
-        typewriter(('Please enter the name of the {} player: ').format(NUMERIC[i]))
-        player = Player(input())
-        typewriter("Perfect! " + player.name + ", let's have your ships arranged.\n")
-        player.arrange_home_ships()
-    
     typewriter("Let's get started.\n")
     sleep(1)
     print("\033c")
@@ -52,20 +51,19 @@ def make_a_shot(assailant, opponent: Player):
         if opponent.is_sunk(shot_square_index):
             typewriter('\nYou have just sunk the whole ship. ')
             sleep(0.7)
-            
+
             for ship_deck in opponent.find_ship(shot_square_index):
                 for offset in Grid.offset_values(ship_deck):
-                    if opponent.homegrid[shot_square_index + offset] != HIT:
+                    if opponent.homegrid[ship_deck + offset] != HIT:
                         opponent.homegrid[shot_square_index + offset] = OFF
                         assailant.foegrid[shot_square_index + offset] = OFF
 
-
         typewriter('\nYou make one more shot.')
         sleep(0.5)
-        
+
         return True
 
-    else: 
+    else:
         assailant.foegrid[shot_square_index] = OFF
         opponent.homegrid[shot_square_index] = OFF
         typewriter('Miss. Now {}\'s turn.'.format(opponent.name))
@@ -74,14 +72,14 @@ def make_a_shot(assailant, opponent: Player):
         return False
 
 
-def shooting_turns(player1, player2): 
+def shooting_turns(player1, player2):
     """invokes 'make_a_shot' function in turns for each"""
     while (player1.homegrid.count(HIT) != 20) or (player2.homegrid.count(HIT) != 20):
         while make_a_shot(player1, player2):
             continue
         while make_a_shot(player2, player1):
             continue
-    
+
     if player1.homegrid.count(HIT) == 20:
         typewriter(player2.name + 'won!')
     else:
@@ -94,7 +92,7 @@ def main():
 
 
 if __name__ == '__main__':
-    try: 
+    try:
         main()
     except KeyboardInterrupt:
         typewriter('\nSee you next time!')

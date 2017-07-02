@@ -11,9 +11,9 @@ SHIPS_DETAILS = {
     "single-decker": (1, 4),
 }
 
-NUMERIC = {
-    0: "first",
-    1: "second",
-    2: "third",
-    3: "last",
-}
+NUMERIC = [
+		   "first",
+		   "second",
+		   "third",
+		   "last",
+]
