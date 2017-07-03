@@ -7,7 +7,6 @@ def game_init():
     """creates players and their ships"""
     
     def create_player(turn):
-        """  """
         print("\033c")
         typewriter(('Please enter the name of the {} player: ').format(NUMERIC[turn]))
         player = Player(input())
@@ -23,7 +22,7 @@ def game_init():
     player1, player2 = create_player(0), create_player(1)
 
     typewriter("Let's get started.\n")
-    sleep(1)
+    sleep(1.3)
     print("\033c")
 
     return player1, player2
@@ -39,8 +38,9 @@ def make_a_shot(assailant, opponent: Player):
 
     shot_square_index = opponent.homegrid.check_index(input())
 
-    while opponent.homegrid[shot_square_index] == OFF:
-        print('You already made that shot.')
+    while opponent.homegrid[shot_square_index] == OFF or \
+          opponent.homegrid[shot_square_index] == HIT:
+        print('You already made this shot.')
         shot_square_index = opponent.homegrid.check_index(input('Try another square: '))
 
     if opponent.homegrid[shot_square_index] == DECK:
@@ -54,9 +54,9 @@ def make_a_shot(assailant, opponent: Player):
 
             for ship_deck in opponent.find_ship(shot_square_index):
                 for offset in Grid.offset_values(ship_deck):
-                    if opponent.homegrid[ship_deck + offset] != HIT:
-                        opponent.homegrid[shot_square_index + offset] = OFF
-                        assailant.foegrid[shot_square_index + offset] = OFF
+                    if ship_deck + offset not in opponent.find_ship(shot_square_index):
+                        opponent.homegrid[ship_deck + offset] = OFF
+                        assailant.foegrid[ship_deck + offset] = OFF
 
         typewriter('\nYou make one more shot.')
         sleep(0.5)
@@ -89,7 +89,6 @@ def shooting_turns(player1, player2):
 def main():
     player1, player2 = game_init()
     shooting_turns(player1, player2)
-
 
 if __name__ == '__main__':
     try:
