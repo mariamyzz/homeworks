@@ -22,7 +22,7 @@ def game_init():
     player1, player2 = create_player(0), create_player(1)
 
     typewriter("Let's get started.\n")
-    sleep(1.3)
+    sleep(1.0)
     print("\033c")
 
     return player1, player2
