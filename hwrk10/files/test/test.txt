@@ -1,0 +1,1 @@
+Those two ways are equivalent, but the first one is more clear and leaves you with a function to call on your whim (and in tests). Note that werkzeug.exceptions.HTTPException subclasses like BadRequest from the example and their HTTP codes are interchangeable when handed to the registration methods or decorator (BadRequest.code == 400).
