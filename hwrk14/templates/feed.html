@@ -6,6 +6,7 @@
 </head>
 
 <body>
+  <a href="/create">Add a post</a>
   <h2> Post feed:</h2>
   {% for post in posts if post.is_visible %}
     <h4><a href="/post/{{post.id}}">{{post.title}}</a></h4>
