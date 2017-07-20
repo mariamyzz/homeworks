@@ -3,9 +3,8 @@
 import config as config
 
 from datetime import date
-from flask import Flask, request, render_template, flash
+from flask import Flask, request, render_template
 from flask_sqlalchemy import SQLAlchemy
-from flask_wtf import FlaskForm
 from wtforms_alchemy import ModelForm
 
 app = Flask(__name__, template_folder='templates')
@@ -43,6 +42,11 @@ class PostForm(ModelForm):
     class Meta:
         model = Post
 
+class CommentForm(ModelForm):
+	class Meta:
+		model = Comment
+		include = ['post_id', ]
+
 @app.route('/create', methods=['GET', 'POST'])
 def create_post():
 	if request.method == 'GET':
@@ -67,9 +71,20 @@ def index():
 
 @app.route('/post/<post_id>', methods=['GET', 'POST'])
 def post_view(post_id):
-	post_id = int(post_id)
-	post = Post.query.filter_by(id=post_id).first()
-	return render_template('post_view.html', post=post)
+	if request.method == 'GET':
+		post_id = int(post_id)
+		post = Post.query.filter_by(id=post_id).first()
+		comments = Comment.query.filter_by(post_id=post_id).all()
+		return render_template('post_view.html', post=post, comments=comments)
+	else: 
+		form = CommentForm(request.form)
+		if form.validate():
+			comment = Comment(**form.data)
+			db.session.add(comment)
+			db.session.commit()
+			return 'Thank you for leaving a comment.'
+		else: 
+			return render_template('validation_error.html')
 
 
 if __name__ == '__main__':

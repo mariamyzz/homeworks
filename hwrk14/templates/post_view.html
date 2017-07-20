@@ -8,8 +8,18 @@
 <body>
 {% if post.is_visible %}
   <h2>{{post.title}}</h2>
-  <h6>{{post.date_created}}
+  <h6>{{post.date_created}}</h6>
   <p>{{post.content}}</p>
+  {% for comment in comments %}
+    <p>{{comment.date_created}}</p>
+    <p>{{comment.body}}</p>
+  {% endfor %}
+  <form action="/post/{{post.id}}" method="post">
+  	Leave a comment:<br>
+  	<textarea cols="200" rows="10" name="body"></textarea><br>
+    <input type="hidden" name="is_visible" value="True">
+  	<input type="submit" value="Submit">
+	</form>
 {% else %}
   <h2>This post is hidden.</h2>
 {% endif %}
