@@ -1,0 +1,20 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <title>Simple Imageboard v0.1</title>
+</head>
+
+<body>
+  <h2> Create a new post: </h2>
+  <form action="/create" method="post">
+  	Your post title:<br>
+  	<input type="text" name="title"><br>
+  	Your post content:<br>
+  	<textarea cols="200" rows="10" name="content"></textarea><br>
+    <input type="hidden" name="is_visible" value="True"> 
+  	<input type="submit" value="Submit">
+	</form>
+
+</body>
+</html>
